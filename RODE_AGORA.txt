@@ -1,0 +1,98 @@
+🚀 RODAR MINISPOT EM 2 MINUTOS - GUIA RÁPIDO
+═══════════════════════════════════════════════════════════════
+
+Você tem Java 8, mas precisa de Java 11+.
+Mas não se preocupa! Tem 3 formas super fáceis:
+
+═══════════════════════════════════════════════════════════════
+OPÇÃO 1: VS CODE (MAIS FÁCIL - 2 MINUTOS) ⭐⭐⭐
+═══════════════════════════════════════════════════════════════
+
+O VS Code AUTOMATICAMENTE:
+✓ Baixa Java 11+
+✓ Baixa JavaFX
+✓ Compila seu código
+✓ Roda a aplicação
+
+PASSOS:
+
+1. Baixe VS Code: https://code.visualstudio.com/
+   (Só takes 30 segundos)
+
+2. Instale esta extensão:
+   - Abra VS Code
+   - Pressione: Ctrl+Shift+X
+   - Procure: "Extension Pack for Java"
+   - Clique: Install (é da Microsoft, confiável)
+
+3. Abra o projeto:
+   - File → Open Folder
+   - Selecione: c:\Users\jv806\OneDrive\Área de Trabalho\Github\MiniSpot
+
+4. Rode a aplicação:
+   - Abra: src/main/java/com/example/ui/MainApplication.java
+   - Você vai ver um botão "Run" acima da classe
+   - Clique nele!
+
+5. PRONTO! ✨
+   A interface vai abrir automaticamente!
+
+═══════════════════════════════════════════════════════════════
+OPÇÃO 2: INSTALAR JAVA 11+ (5 MINUTOS)
+═══════════════════════════════════════════════════════════════
+
+Se preferir ter Java 11+ instalado globalmente:
+
+1. Baixe: https://www.oracle.com/java/technologies/downloads/
+   - Selecione: JDK 21 (ou 11, 17, 19)
+   - Clique: Download
+
+2. Instale normalmente (next, next, finish)
+
+3. Reinicie PowerShell/Terminal
+
+4. Depois você pode rodar:
+   mvn clean compile
+   mvn javafx:run
+
+═══════════════════════════════════════════════════════════════
+OPÇÃO 3: DOCKER (SEM INSTALAR NADA)
+═══════════════════════════════════════════════════════════════
+
+Se tiver Docker instalado:
+
+docker run --rm -it \
+  -v "c:\Users\jv806\OneDrive\Área de Trabalho\Github\MiniSpot":/app \
+  maven:3.9-eclipse-temurin-21 \
+  bash -c "cd /app && mvn javafx:run"
+
+═══════════════════════════════════════════════════════════════
+
+📌 RECOMENDAÇÃO:
+
+Use a OPÇÃO 1 (VS Code)!
+- Mais fácil
+- Mais rápido
+- Sem instalações extras
+- Tudo automático
+
+═══════════════════════════════════════════════════════════════
+
+RESUMO:
+
+Seu Java 8 está OK para desenvolviment básico,
+mas JavaFX moderno precisa de Java 11+.
+
+A melhor forma é usar VS Code que faz tudo
+automaticamente em segundos.
+
+═══════════════════════════════════════════════════════════════
+
+Qualquer dúvida, está em:
+- 00_LEIA_PRIMEIRO.txt
+- COMO_EXECUTAR.md
+- INSTALACAO.md
+
+═══════════════════════════════════════════════════════════════
+
+Boa sorte! 🎵🎶
