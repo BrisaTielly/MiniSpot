@@ -7,10 +7,12 @@ import java.util.List;
 public class ArtistaRepository {
     private List<Artista> artistas;
     private long proximoId;
+    private AlbumRepository albumRepository;
 
-    public ArtistaRepository() {
+    public ArtistaRepository(AlbumRepository albumRepository) {
         this.artistas = new ArrayList<>();
         this.proximoId = 1;
+        this.albumRepository = albumRepository;
     }
 
     public List<Artista> listarTodos() {
@@ -42,6 +44,7 @@ public class ArtistaRepository {
     public void excluir(long id) {
         Artista artista = buscarPorId(id);
         if (artista != null) {
+            albumRepository.excluirAlbunsPorArtista(id);
             artistas.remove(artista);
         }
     }

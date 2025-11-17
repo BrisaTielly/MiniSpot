@@ -62,6 +62,10 @@ public class AlbumRepository {
         }
     }
 
+    public void excluirAlbunsPorArtista(long artistaId) {
+        albuns.removeIf(album -> album.getArtista() != null && album.getArtista().getId() == artistaId);
+    }
+
     public void excluirPorArtista(Artista artista) {
         if (artista.getListaAlbuns() != null) {
             albuns.removeAll(artista.getListaAlbuns());

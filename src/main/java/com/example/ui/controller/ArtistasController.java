@@ -15,9 +15,11 @@ public class ArtistasController {
     private ArtistaRepository repository;
     private ListView<Artista> listView;
     private TextField nomeField;
+    private MainController mainController;
 
-    public ArtistasController(ArtistaRepository repository) {
+    public ArtistasController(ArtistaRepository repository, MainController mainController) {
         this.repository = repository;
+        this.mainController = mainController;
         this.view = new VBox();
         this.listView = new ListView<>();
         initUI();
@@ -100,6 +102,7 @@ public class ArtistasController {
         repository.adicionar(nome);
         nomeField.clear();
         atualizarLista();
+        mainController.atualizarComboArtistas();
         mostrarSucesso("Artista adicionado com sucesso!");
     }
 
@@ -116,6 +119,8 @@ public class ArtistasController {
         dialog.showAndWait().ifPresent(novoNome -> {
             repository.atualizar(selecionado.getId(), novoNome);
             atualizarLista();
+            mainController.atualizarComboArtistas();
+            mainController.atualizarListaDeAlbuns();
             mostrarSucesso("Artista atualizado!");
         });
     }
@@ -136,6 +141,8 @@ public class ArtistasController {
             if (result == ButtonType.OK) {
                 repository.excluir(selecionado.getId());
                 atualizarLista();
+                mainController.atualizarComboArtistas();
+                mainController.atualizarListaDeAlbuns();
                 mostrarSucesso("Artista excluído!");
             }
         });

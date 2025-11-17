@@ -18,13 +18,13 @@ public class MainController {
     private PlaylistRepository playlistRepository;
 
     private ArtistasController artistasController;
-    private AlbunsController albunsController;
     private FaixasController faixasController;
     private PlaylistsController playlistsController;
+    private AlbunsController albunsController;
 
     public MainController() {
-        this.artistaRepository = new ArtistaRepository();
         this.albumRepository = new AlbumRepository();
+        this.artistaRepository = new ArtistaRepository(albumRepository);
         this.faixaRepository = new FaixaRepository();
         this.playlistRepository = new PlaylistRepository();
         
@@ -45,7 +45,7 @@ public class MainController {
         tabPane.setStyle("-fx-font-size: 12px;");
         
         // Criar controllers e armazenar referências
-        artistasController = new ArtistasController(artistaRepository);
+        artistasController = new ArtistasController(artistaRepository, this);
         albunsController = new AlbunsController(albumRepository, artistaRepository);
         faixasController = new FaixasController(faixaRepository, albumRepository, playlistRepository);
         playlistsController = new PlaylistsController(playlistRepository, faixaRepository);
@@ -140,6 +140,18 @@ public class MainController {
         }
         if (playlistsController != null) {
             playlistsController.atualizarLista();
+        }
+    }
+
+    public void atualizarComboArtistas() {
+        if (albunsController != null) {
+            albunsController.atualizarComboArtistas();
+        }
+    }
+
+    public void atualizarListaDeAlbuns() {
+        if (albunsController != null) {
+            albunsController.atualizarLista();
         }
     }
 

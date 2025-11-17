@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Scanner;
 
 public class Main {
-    private static ArtistaRepository artistaRepository = new ArtistaRepository();
     private static AlbumRepository albumRepository = new AlbumRepository();
+    private static ArtistaRepository artistaRepository = new ArtistaRepository(albumRepository);
     private static FaixaRepository faixaRepository = new FaixaRepository();
     private static PlaylistRepository playlistRepository = new PlaylistRepository();
     private static Scanner scanner = new Scanner(System.in);

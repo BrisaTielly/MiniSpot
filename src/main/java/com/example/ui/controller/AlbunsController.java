@@ -12,6 +12,7 @@ import com.example.model.Artista;
 import com.example.repository.AlbumRepository;
 import com.example.repository.ArtistaRepository;
 import java.time.Year;
+import javafx.util.StringConverter;
 
 public class AlbunsController {
     private VBox view;
@@ -64,6 +65,18 @@ public class AlbunsController {
         artistaCombo = new ComboBox<>();
         artistaCombo.setPrefWidth(200);
         atualizarComboArtistas();
+
+        artistaCombo.setConverter(new StringConverter<Artista>() {
+            @Override
+            public String toString(Artista object) {
+                return object == null ? "Selecione" : object.getNome();
+            }
+
+            @Override
+            public Artista fromString(String string) {
+                return null;
+            }
+        });
 
         Button btnAdicionar = new Button("➕ Adicionar");
         btnAdicionar.setStyle("-fx-padding: 8px 20px; -fx-background-color: #1db954; -fx-text-fill: white;");
@@ -172,7 +185,7 @@ public class AlbunsController {
         listView.setItems(items);
     }
 
-    private void atualizarComboArtistas() {
+    public void atualizarComboArtistas() {
         ObservableList<Artista> artistas = FXCollections.observableArrayList(artistaRepository.listarTodos());
         artistaCombo.setItems(artistas);
     }
