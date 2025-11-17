@@ -1,8 +1,8 @@
 package com.example.repository;
 
 import com.example.model.Faixa;
-import com.example.model.FaixaNormal;
-import com.example.model.FaixaFavorita;
+import com.example.model.Musica;
+import com.example.model.Podcast;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,22 +29,29 @@ public class FaixaRepository {
         return null;
     }
 
-    public Faixa adicionarFaixaNormal(String nome, Duration duracao) {
-        FaixaNormal novaFaixa = new FaixaNormal();
-        novaFaixa.setId(proximoId++);
-        novaFaixa.setNome(nome);
-        novaFaixa.setDuracao(duracao);
-        faixas.add(novaFaixa);
-        return novaFaixa;
+    public Faixa adicionarMusica(String nome, Duration duracao) {
+        Musica nova = new Musica();
+        nova.setId(proximoId++);
+        nova.setNome(nome);
+        nova.setDuracao(duracao);
+        faixas.add(nova);
+        return nova;
     }
 
-    public Faixa adicionarFaixaFavorita(String nome, Duration duracao) {
-        FaixaFavorita novaFaixa = new FaixaFavorita();
-        novaFaixa.setId(proximoId++);
-        novaFaixa.setNome(nome);
-        novaFaixa.setDuracao(duracao);
-        faixas.add(novaFaixa);
-        return novaFaixa;
+    public Faixa adicionarPodcast(String nome, Duration duracao) {
+        return adicionarPodcast(nome, duracao, null);
+    }
+
+    public Faixa adicionarPodcast(String nome, Duration duracao, String apresentador) {
+        Podcast nova = new Podcast();
+        nova.setId(proximoId++);
+        nova.setNome(nome);
+        nova.setDuracao(duracao);
+        if (apresentador != null && !apresentador.isBlank()) {
+            nova.setApresentador(apresentador);
+        }
+        faixas.add(nova);
+        return nova;
     }
 
     public void atualizarNome(long id, String novoNome) {
@@ -72,4 +79,3 @@ public class FaixaRepository {
         return faixas.size();
     }
 }
-

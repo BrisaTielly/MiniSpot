@@ -8,7 +8,7 @@ import javafx.geometry.Pos;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import com.example.model.Faixa;
-import com.example.model.FaixaFavorita;
+import com.example.model.Podcast;
 import com.example.repository.FaixaRepository;
 import com.example.repository.AlbumRepository;
 import com.example.repository.PlaylistRepository;
@@ -23,7 +23,8 @@ public class FaixasController {
     private TextField nomeField;
     private Spinner<Integer> minutosSpinner;
     private Spinner<Integer> segundosSpinner;
-    private CheckBox favoritaCheckBox;
+    private ChoiceBox<String> tipoChoiceBox;
+    private TextField apresentadorField;
 
     public FaixasController(FaixaRepository faixaRepository, AlbumRepository albumRepository, PlaylistRepository playlistRepository) {
         this.faixaRepository = faixaRepository;
@@ -73,13 +74,24 @@ public class FaixasController {
         segundosSpinner.setPrefWidth(70);
         Label labelSeg = new Label("seg");
 
-        favoritaCheckBox = new CheckBox("⭐ Favorita");
+        Label labelTipo = new Label("Tipo:");
+        tipoChoiceBox = new ChoiceBox<>(FXCollections.observableArrayList("Música", "Podcast"));
+        tipoChoiceBox.setValue("Música");
+
+        apresentadorField = new TextField();
+        apresentadorField.setPromptText("Apresentador do podcast...");
+        apresentadorField.setPrefWidth(180);
+        apresentadorField.setVisible(false);
+
+        tipoChoiceBox.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            apresentadorField.setVisible("Podcast".equals(newVal));
+        });
 
         Button btnAdicionar = new Button("➕ Adicionar");
         btnAdicionar.setStyle("-fx-padding: 8px 20px; -fx-background-color: #1db954; -fx-text-fill: white;");
         btnAdicionar.setOnAction(e -> adicionarFaixa());
 
-        panel.getChildren().addAll(labelNome, nomeField, labelDuracao, minutosSpinner, labelMin, segundosSpinner, labelSeg, favoritaCheckBox, btnAdicionar);
+        panel.getChildren().addAll(labelNome, nomeField, labelDuracao, minutosSpinner, labelMin, segundosSpinner, labelSeg, labelTipo, tipoChoiceBox, apresentadorField, btnAdicionar);
         return panel;
     }
 
@@ -117,16 +129,19 @@ public class FaixasController {
         Duration duracao = Duration.ofMinutes(minutos).plusSeconds(segundos);
 
         Faixa novaFaixa;
-        if (favoritaCheckBox.isSelected()) {
-            novaFaixa = faixaRepository.adicionarFaixaFavorita(nome, duracao);
+        if ("Podcast".equals(tipoChoiceBox.getValue())) {
+            String apresentador = apresentadorField.getText().trim();
+            novaFaixa = faixaRepository.adicionarPodcast(nome, duracao, apresentador.isEmpty() ? null : apresentador);
         } else {
-            novaFaixa = faixaRepository.adicionarFaixaNormal(nome, duracao);
+            novaFaixa = faixaRepository.adicionarMusica(nome, duracao);
         }
 
         nomeField.clear();
         minutosSpinner.getValueFactory().setValue(3);
         segundosSpinner.getValueFactory().setValue(45);
-        favoritaCheckBox.setSelected(false);
+        tipoChoiceBox.setValue("Música");
+        apresentadorField.clear();
+        apresentadorField.setVisible(false);
         atualizarLista();
         mostrarSucesso("Faixa adicionada!");
     }
@@ -180,7 +195,11 @@ public class FaixasController {
         detalhes.append("ID: ").append(selecionada.getId()).append("\n");
         detalhes.append("Nome: ").append(selecionada.getNome()).append("\n");
         detalhes.append("Duração: ").append(formatarDuracao(selecionada.getDuracao())).append("\n");
-        detalhes.append("Tipo: ").append(selecionada instanceof FaixaFavorita ? "⭐ Favorita" : "♪ Normal");
+        detalhes.append("Tipo: ").append(selecionada instanceof Podcast ? "🎙 Podcast" : "♪ Música");
+        if (selecionada instanceof Podcast) {
+            Podcast p = (Podcast) selecionada;
+            detalhes.append("\nApresentador: ").append(p.getApresentador() == null ? "(não informado)" : p.getApresentador());
+        }
 
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Detalhes da Faixa");
@@ -231,15 +250,23 @@ public class FaixasController {
                 cellBox.setPadding(new Insets(10));
                 cellBox.setStyle("-fx-border-color: #eee; -fx-border-width: 0 0 1 0;");
 
-                String icone = item instanceof FaixaFavorita ? "⭐" : "♪";
+                String icone = item instanceof Podcast ? "🎙" : "♪";
                 Label nomeLabel = new Label(icone + " " + item.getNome());
                 nomeLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
 
                 Label duracaoLabel = new Label(formatarDuracao(item.getDuracao()));
                 duracaoLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #999;");
 
-                VBox textBox = new VBox(nomeLabel, duracaoLabel);
-                cellBox.getChildren().add(textBox);
+                String apresentador = item instanceof Podcast ? ((Podcast) item).getApresentador() : null;
+                if (apresentador != null && !apresentador.isBlank()) {
+                    Label apresentadorLabel = new Label("👤 " + apresentador);
+                    apresentadorLabel.setStyle("-fx-font-size: 10px; -fx-text-fill: #555;");
+                    VBox textBox = new VBox(nomeLabel, duracaoLabel, apresentadorLabel);
+                    cellBox.getChildren().add(textBox);
+                } else {
+                    VBox textBox = new VBox(nomeLabel, duracaoLabel);
+                    cellBox.getChildren().add(textBox);
+                }
                 setGraphic(cellBox);
             }
         }

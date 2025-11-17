@@ -36,11 +36,11 @@ public class Main {
         Artista artista2 = artistaRepository.adicionar("João Silva");
         Artista artista3 = artistaRepository.adicionar("Maria Santos");
 
-        // Criar faixas
-        Faixa faixa1 = faixaRepository.adicionarFaixaNormal("Canção da Manhã", Duration.ofMinutes(3).plusSeconds(45));
-        Faixa faixa2 = faixaRepository.adicionarFaixaFavorita("Noite Estrelada", Duration.ofMinutes(4).plusSeconds(20));
-        Faixa faixa3 = faixaRepository.adicionarFaixaNormal("Vento do Sul", Duration.ofMinutes(3).plusSeconds(15));
-        Faixa faixa4 = faixaRepository.adicionarFaixaFavorita("Melodia do Coração", Duration.ofMinutes(5).plusSeconds(10));
+        // Criar faixas (Música e Podcast)
+        Faixa faixa1 = faixaRepository.adicionarMusica("Canção da Manhã", Duration.ofMinutes(3).plusSeconds(45));
+        Faixa faixa2 = faixaRepository.adicionarPodcast("Noite Estrelada", Duration.ofMinutes(4).plusSeconds(20));
+        Faixa faixa3 = faixaRepository.adicionarMusica("Vento do Sul", Duration.ofMinutes(3).plusSeconds(15));
+        Faixa faixa4 = faixaRepository.adicionarPodcast("Melodia do Coração", Duration.ofMinutes(5).plusSeconds(10));
 
         // Criar álbuns
         Album album1 = albumRepository.adicionar("Amanhecer", artista1, Year.of(2023));
@@ -351,7 +351,7 @@ public class Main {
             return;
         }
 
-        System.out.println("\n📀 DETALHES DO ÁLBUM");
+        System.out.println("\n💿 DETALHES DO ÁLBUM");
         System.out.println("========================================");
         System.out.println("ID: " + album.getId());
         System.out.println("Nome: " + album.getNome());
@@ -362,8 +362,8 @@ public class Main {
             System.out.println("   Nenhuma faixa cadastrada");
         } else {
             for (Faixa faixa : album.getListaFaixas()) {
-                String tipo = faixa instanceof FaixaFavorita ? "⭐" : "♪";
-                System.out.println("   " + tipo + " " + faixa.getNome() + " - " + formatarDuracao(faixa.getDuracao()));
+                String tipo = (faixa instanceof Podcast) ? "🎙 Podcast" : "♪ Música";
+                System.out.println("   " + tipo + ": " + faixa.getNome() + " - " + formatarDuracao(faixa.getDuracao()));
             }
         }
         System.out.println("========================================");
@@ -416,8 +416,8 @@ public class Main {
         System.out.println("📋 LISTA DE FAIXAS:");
         System.out.println("----------------------------------------");
         for (Faixa faixa : faixas) {
-            String tipo = faixa instanceof FaixaFavorita ? "⭐ Favorita" : "♪ Normal";
-            System.out.println("ID: " + faixa.getId() + " | Nome: " + faixa.getNome() + 
+            String tipo = (faixa instanceof Podcast) ? "🎙 Podcast" : "♪ Música";
+            System.out.println("ID: " + faixa.getId() + " | Nome: " + faixa.getNome() +
                              " | Duração: " + formatarDuracao(faixa.getDuracao()) + " | Tipo: " + tipo);
         }
         System.out.println("----------------------------------------");
@@ -434,8 +434,8 @@ public class Main {
         int segundos = lerInteiro();
         
         System.out.println("Tipo de faixa:");
-        System.out.println("1. Faixa Normal");
-        System.out.println("2. Faixa Favorita");
+        System.out.println("1. Música");
+        System.out.println("2. Podcast");
         System.out.print("Escolha: ");
         int tipo = lerInteiro();
 
@@ -443,9 +443,9 @@ public class Main {
         Faixa novaFaixa;
         
         if (tipo == 2) {
-            novaFaixa = faixaRepository.adicionarFaixaFavorita(nome, duracao);
+            novaFaixa = faixaRepository.adicionarPodcast(nome, duracao);
         } else {
-            novaFaixa = faixaRepository.adicionarFaixaNormal(nome, duracao);
+            novaFaixa = faixaRepository.adicionarMusica(nome, duracao);
         }
         
         System.out.println("✅ Faixa '" + nome + "' adicionada com sucesso! (ID: " + novaFaixa.getId() + ")");
@@ -526,7 +526,7 @@ public class Main {
         System.out.println("ID: " + faixa.getId());
         System.out.println("Nome: " + faixa.getNome());
         System.out.println("Duração: " + formatarDuracao(faixa.getDuracao()));
-        System.out.println("Tipo: " + (faixa instanceof FaixaFavorita ? "⭐ Favorita" : "♪ Normal"));
+        System.out.println("Tipo: " + (faixa instanceof Podcast ? "🎙 Podcast" : "♪ Música"));
         System.out.println("========================================");
     }
 
@@ -672,8 +672,8 @@ public class Main {
             int posicao = 1;
             Duration duracaoTotal = Duration.ZERO;
             for (Faixa faixa : playlist.getListaFaixas()) {
-                String tipo = faixa instanceof FaixaFavorita ? "⭐" : "♪";
-                System.out.println("   " + posicao + ". " + tipo + " " + faixa.getNome() + 
+                String tipo = (faixa instanceof Podcast) ? "🎙 Podcast" : "♪ Música";
+                System.out.println("   " + posicao + ". " + tipo + ": " + faixa.getNome() +
                                  " - " + formatarDuracao(faixa.getDuracao()));
                 duracaoTotal = duracaoTotal.plus(faixa.getDuracao());
                 posicao++;

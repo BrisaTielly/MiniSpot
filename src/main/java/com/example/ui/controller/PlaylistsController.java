@@ -9,7 +9,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import com.example.model.Playlist;
 import com.example.model.Faixa;
-import com.example.model.FaixaFavorita;
+import com.example.model.Podcast;
 import com.example.repository.PlaylistRepository;
 import com.example.repository.FaixaRepository;
 import java.time.Duration;
@@ -328,7 +328,7 @@ public class PlaylistsController {
                 cellBox.setPadding(new Insets(8));
                 cellBox.setStyle("-fx-border-color: #eee; -fx-border-width: 0 0 1 0;");
 
-                String icone = item instanceof FaixaFavorita ? "⭐" : "♪";
+                String icone = item instanceof Podcast ? "🎙" : "♪";
                 Label nomeLabel = new Label(icone + " " + item.getNome());
                 nomeLabel.setStyle("-fx-font-size: 12px;");
 
@@ -345,7 +345,7 @@ public class PlaylistsController {
             if (empty || item == null) {
                 setText(null);
             } else {
-                String icone = item instanceof FaixaFavorita ? "⭐" : "♪";
+                String icone = item instanceof Podcast ? "🎙" : "♪";
                 setText(icone + " " + item.getNome());
             }
         }

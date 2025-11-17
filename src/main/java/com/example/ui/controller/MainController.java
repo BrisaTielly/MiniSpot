@@ -101,11 +101,11 @@ public class MainController {
         Artista artista2 = artistaRepository.adicionar("João Silva");
         Artista artista3 = artistaRepository.adicionar("Maria Santos");
 
-        // Criar faixas
-        Faixa faixa1 = faixaRepository.adicionarFaixaNormal("Canção da Manhã", java.time.Duration.ofMinutes(3).plusSeconds(45));
-        Faixa faixa2 = faixaRepository.adicionarFaixaFavorita("Noite Estrelada", java.time.Duration.ofMinutes(4).plusSeconds(20));
-        Faixa faixa3 = faixaRepository.adicionarFaixaNormal("Vento do Sul", java.time.Duration.ofMinutes(3).plusSeconds(15));
-        Faixa faixa4 = faixaRepository.adicionarFaixaFavorita("Melodia do Coração", java.time.Duration.ofMinutes(5).plusSeconds(10));
+        // Criar faixas (Música e Podcast)
+        Faixa faixa1 = faixaRepository.adicionarMusica("Canção da Manhã", java.time.Duration.ofMinutes(3).plusSeconds(45));
+        Faixa faixa2 = faixaRepository.adicionarPodcast("Noite Estrelada", java.time.Duration.ofMinutes(4).plusSeconds(20));
+        Faixa faixa3 = faixaRepository.adicionarMusica("Vento do Sul", java.time.Duration.ofMinutes(3).plusSeconds(15));
+        Faixa faixa4 = faixaRepository.adicionarPodcast("Melodia do Coração", java.time.Duration.ofMinutes(5).plusSeconds(10));
 
         // Criar álbuns
         Album album1 = albumRepository.adicionar("Amanhecer", artista1, java.time.Year.of(2023));

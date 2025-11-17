@@ -82,6 +82,10 @@
     -fx-background-color: #1aa34a;
 }
 
+.list-view .list-cell:hover {
+    -fx-background-color: #f0fdf4;
+}
+
 /* TabPane Styles */
 .tab-pane {
     -fx-tab-min-width: 150px;
@@ -159,4 +163,36 @@
     -fx-background-color: #191414;
     -fx-text-fill: #1db954;
     -fx-padding: 10px;
+}
+
+/* Tipo Badges */
+.badge-musica {
+    -fx-background-color: #1db954;
+    -fx-text-fill: white;
+    -fx-padding: 2px 6px;
+    -fx-font-size: 10px;
+    -fx-background-radius: 8;
+}
+.badge-podcast {
+    -fx-background-color: #ff9800;
+    -fx-text-fill: white;
+    -fx-padding: 2px 6px;
+    -fx-font-size: 10px;
+    -fx-background-radius: 8;
+}
+.panel {
+    -fx-background-color: white;
+    -fx-border-color: #ddd;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-padding: 12px;
+}
+.title-primary {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #191414;
+}
+.subtitle {
+    -fx-font-size: 11px;
+    -fx-text-fill: #666;
 }
