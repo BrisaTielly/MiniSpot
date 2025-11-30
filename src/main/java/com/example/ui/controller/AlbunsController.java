@@ -18,13 +18,16 @@ public class AlbunsController {
     private VBox view;
     private AlbumRepository albumRepository;
     private ArtistaRepository artistaRepository;
+    private MainController mainController;
     private ListView<Album> listView;
     private TextField nomeField;
     private ComboBox<Artista> artistaCombo;
 
-    public AlbunsController(AlbumRepository albumRepository, ArtistaRepository artistaRepository) {
+    public AlbunsController(AlbumRepository albumRepository, ArtistaRepository artistaRepository,
+            MainController mainController) {
         this.albumRepository = albumRepository;
         this.artistaRepository = artistaRepository;
+        this.mainController = mainController;
         this.view = new VBox();
         this.listView = new ListView<>();
         initUI();
@@ -155,6 +158,7 @@ public class AlbunsController {
             if (result == ButtonType.OK) {
                 albumRepository.excluir(selecionado.getId());
                 atualizarLista();
+                mainController.atualizarListaDeFaixas();
                 mostrarSucesso("Álbum excluído!");
             }
         });

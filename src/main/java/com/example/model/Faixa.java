@@ -40,6 +40,26 @@ public abstract class Faixa {
         this.duracao = duracao;
     }
 
+    private Artista artista;
+
+    public Artista getArtista() {
+        return artista;
+    }
+
+    public void setArtista(Artista artista) {
+        this.artista = artista;
+    }
+
+    private Album album;
+
+    public Album getAlbum() {
+        return album;
+    }
+
+    public void setAlbum(Album album) {
+        this.album = album;
+    }
+
     public abstract void tocar();
     public abstract void exibirInfo();
 }

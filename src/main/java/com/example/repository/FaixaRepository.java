@@ -1,5 +1,7 @@
 package com.example.repository;
 
+import com.example.model.Album;
+import com.example.model.Artista;
 import com.example.model.Faixa;
 import com.example.model.Musica;
 import com.example.model.Podcast;
@@ -29,24 +31,27 @@ public class FaixaRepository {
         return null;
     }
 
-    public Faixa adicionarMusica(String nome, Duration duracao) {
+    public Faixa adicionarMusica(String nome, Duration duracao, Artista artista, Album album) {
         Musica nova = new Musica();
         nova.setId(proximoId++);
         nova.setNome(nome);
         nova.setDuracao(duracao);
+        nova.setArtista(artista);
+        nova.setAlbum(album);
         faixas.add(nova);
         return nova;
     }
 
-    public Faixa adicionarPodcast(String nome, Duration duracao) {
-        return adicionarPodcast(nome, duracao, null);
+    public Faixa adicionarPodcast(String nome, Duration duracao, Artista artista) {
+        return adicionarPodcast(nome, duracao, artista, null);
     }
 
-    public Faixa adicionarPodcast(String nome, Duration duracao, String apresentador) {
+    public Faixa adicionarPodcast(String nome, Duration duracao, Artista artista, String apresentador) {
         Podcast nova = new Podcast();
         nova.setId(proximoId++);
         nova.setNome(nome);
         nova.setDuracao(duracao);
+        nova.setArtista(artista);
         if (apresentador != null && !apresentador.isBlank()) {
             nova.setApresentador(apresentador);
         }
@@ -73,6 +78,14 @@ public class FaixaRepository {
         if (faixa != null) {
             faixas.remove(faixa);
         }
+    }
+
+    public void excluirPorAlbum(Album album) {
+        faixas.removeIf(f -> f.getAlbum() != null && f.getAlbum().getId() == album.getId());
+    }
+
+    public void excluirPorArtista(Artista artista) {
+        faixas.removeIf(f -> f.getArtista() != null && f.getArtista().getId() == artista.getId());
     }
 
     public int contar() {

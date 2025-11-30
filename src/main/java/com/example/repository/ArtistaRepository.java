@@ -9,10 +9,13 @@ public class ArtistaRepository {
     private long proximoId;
     private AlbumRepository albumRepository;
 
-    public ArtistaRepository(AlbumRepository albumRepository) {
+    private FaixaRepository faixaRepository;
+
+    public ArtistaRepository(AlbumRepository albumRepository, FaixaRepository faixaRepository) {
         this.artistas = new ArrayList<>();
         this.proximoId = 1;
         this.albumRepository = albumRepository;
+        this.faixaRepository = faixaRepository;
     }
 
     public List<Artista> listarTodos() {
@@ -44,6 +47,9 @@ public class ArtistaRepository {
     public void excluir(long id) {
         Artista artista = buscarPorId(id);
         if (artista != null) {
+            // Excluir faixas associadas ao artista (cascata)
+            faixaRepository.excluirPorArtista(artista);
+
             albumRepository.excluirAlbunsPorArtista(id);
             artistas.remove(artista);
         }

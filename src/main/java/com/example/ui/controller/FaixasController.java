@@ -1,17 +1,24 @@
 package com.example.ui.controller;
 
 import javafx.geometry.Insets;
+import java.util.List;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.HBox;
 import javafx.scene.control.*;
 import javafx.geometry.Pos;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import com.example.model.Album;
+import com.example.model.Artista;
 import com.example.model.Faixa;
 import com.example.model.Podcast;
 import com.example.repository.FaixaRepository;
 import com.example.repository.AlbumRepository;
 import com.example.repository.PlaylistRepository;
+import com.example.repository.ArtistaRepository;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
+import javafx.util.StringConverter;
 import java.time.Duration;
 
 public class FaixasController {
@@ -19,17 +26,22 @@ public class FaixasController {
     private FaixaRepository faixaRepository;
     private AlbumRepository albumRepository;
     private PlaylistRepository playlistRepository;
+    private ArtistaRepository artistaRepository;
     private ListView<Faixa> listView;
     private TextField nomeField;
     private Spinner<Integer> minutosSpinner;
     private Spinner<Integer> segundosSpinner;
     private ChoiceBox<String> tipoChoiceBox;
+    private ChoiceBox<Artista> artistaChoiceBox;
+    private ChoiceBox<Album> albumChoiceBox;
     private TextField apresentadorField;
 
-    public FaixasController(FaixaRepository faixaRepository, AlbumRepository albumRepository, PlaylistRepository playlistRepository) {
+    public FaixasController(FaixaRepository faixaRepository, AlbumRepository albumRepository,
+            PlaylistRepository playlistRepository, ArtistaRepository artistaRepository) {
         this.faixaRepository = faixaRepository;
         this.albumRepository = albumRepository;
         this.playlistRepository = playlistRepository;
+        this.artistaRepository = artistaRepository;
         this.view = new VBox();
         this.listView = new ListView<>();
         initUI();
@@ -44,7 +56,7 @@ public class FaixasController {
         Label titulo = new Label("Gerenciar Faixas");
         titulo.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
 
-        HBox inputPanel = criarInputPanel();
+        VBox inputPanel = criarInputPanel();
         listView.setPrefHeight(300);
         listView.setCellFactory(param -> new FaixaCellFactory());
         
@@ -53,45 +65,134 @@ public class FaixasController {
         view.getChildren().addAll(titulo, inputPanel, listView, botoesPanel);
     }
 
-    private HBox criarInputPanel() {
-        HBox panel = new HBox();
+    private VBox criarInputPanel() {
+        VBox panel = new VBox();
         panel.setSpacing(10);
         panel.setPadding(new Insets(15));
         panel.setStyle("-fx-background-color: white; -fx-border-color: #ddd; -fx-border-radius: 5;");
-        panel.setAlignment(Pos.CENTER_LEFT);
 
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setAlignment(Pos.CENTER_LEFT);
+
+        // Row 0: Nome, Duração, Tipo
         Label labelNome = new Label("Nome:");
         nomeField = new TextField();
         nomeField.setPromptText("Nome da faixa...");
-        nomeField.setPrefWidth(200);
+        nomeField.setMaxWidth(Double.MAX_VALUE);
+        GridPane.setHgrow(nomeField, Priority.ALWAYS);
 
         Label labelDuracao = new Label("Duração:");
+        HBox duracaoBox = new HBox(5);
+        duracaoBox.setAlignment(Pos.CENTER_LEFT);
         minutosSpinner = new Spinner<>(0, 59, 3);
-        minutosSpinner.setPrefWidth(70);
-        Label labelMin = new Label("min");
-        
+        minutosSpinner.setPrefWidth(80);
+        minutosSpinner.setEditable(true);
+        Label labelMin = new Label("m");
         segundosSpinner = new Spinner<>(0, 59, 45);
-        segundosSpinner.setPrefWidth(70);
-        Label labelSeg = new Label("seg");
+        segundosSpinner.setPrefWidth(80);
+        segundosSpinner.setEditable(true);
+        Label labelSeg = new Label("s");
+        duracaoBox.getChildren().addAll(minutosSpinner, labelMin, segundosSpinner, labelSeg);
 
         Label labelTipo = new Label("Tipo:");
         tipoChoiceBox = new ChoiceBox<>(FXCollections.observableArrayList("Música", "Podcast"));
         tipoChoiceBox.setValue("Música");
+        tipoChoiceBox.setPrefWidth(100);
+
+        grid.add(labelNome, 0, 0);
+        grid.add(nomeField, 1, 0);
+        grid.add(labelDuracao, 2, 0);
+        grid.add(duracaoBox, 3, 0);
+        grid.add(labelTipo, 4, 0);
+        grid.add(tipoChoiceBox, 5, 0);
+
+        // Row 1: Artista, Álbum, Botão
+        Label labelArtista = new Label("Artista:");
+        artistaChoiceBox = new ChoiceBox<>();
+        artistaChoiceBox.setMaxWidth(Double.MAX_VALUE);
+        GridPane.setHgrow(artistaChoiceBox, Priority.ALWAYS);
+        artistaChoiceBox.setConverter(new StringConverter<Artista>() {
+            @Override
+            public String toString(Artista object) {
+                return object == null ? "Selecione..." : object.getNome();
+            }
+
+            @Override
+            public Artista fromString(String string) {
+                return null;
+            }
+        });
 
         apresentadorField = new TextField();
-        apresentadorField.setPromptText("Apresentador do podcast...");
-        apresentadorField.setPrefWidth(180);
+        apresentadorField.setPromptText("Apresentador...");
+        apresentadorField.setMaxWidth(Double.MAX_VALUE);
+        GridPane.setHgrow(apresentadorField, Priority.ALWAYS);
         apresentadorField.setVisible(false);
 
-        tipoChoiceBox.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
-            apresentadorField.setVisible("Podcast".equals(newVal));
+        Label labelAlbum = new Label("Álbum:");
+        albumChoiceBox = new ChoiceBox<>();
+        albumChoiceBox.setMaxWidth(Double.MAX_VALUE);
+        GridPane.setHgrow(albumChoiceBox, Priority.ALWAYS);
+        albumChoiceBox.setConverter(new StringConverter<Album>() {
+            @Override
+            public String toString(Album object) {
+                return object == null ? "Nenhum" : object.getNome();
+            }
+
+            @Override
+            public Album fromString(String string) {
+                return null;
+            }
         });
 
         Button btnAdicionar = new Button("➕ Adicionar");
-        btnAdicionar.setStyle("-fx-padding: 8px 20px; -fx-background-color: #1db954; -fx-text-fill: white;");
+        btnAdicionar.setMaxWidth(Double.MAX_VALUE);
+        btnAdicionar.setStyle("-fx-background-color: #1db954; -fx-text-fill: white; -fx-font-weight: bold;");
         btnAdicionar.setOnAction(e -> adicionarFaixa());
 
-        panel.getChildren().addAll(labelNome, nomeField, labelDuracao, minutosSpinner, labelMin, segundosSpinner, labelSeg, labelTipo, tipoChoiceBox, apresentadorField, btnAdicionar);
+        grid.add(labelArtista, 0, 1);
+        grid.add(artistaChoiceBox, 1, 1);
+        grid.add(apresentadorField, 1, 1);
+
+        grid.add(labelAlbum, 2, 1);
+        grid.add(albumChoiceBox, 3, 1);
+
+        grid.add(btnAdicionar, 4, 1, 2, 1);
+
+        tipoChoiceBox.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            boolean isPodcast = "Podcast".equals(newVal);
+            apresentadorField.setVisible(isPodcast);
+            labelArtista.setText(isPodcast ? "Apresentador:" : "Artista:");
+
+            labelAlbum.setVisible(!isPodcast);
+            albumChoiceBox.setVisible(!isPodcast);
+
+            if (isPodcast) {
+                if (grid.getChildren().contains(artistaChoiceBox))
+                    grid.getChildren().remove(artistaChoiceBox);
+                if (!grid.getChildren().contains(apresentadorField))
+                    grid.add(apresentadorField, 1, 1);
+
+                // Clear album selection for podcast
+                albumChoiceBox.setValue(null);
+            } else {
+                if (grid.getChildren().contains(apresentadorField))
+                    grid.getChildren().remove(apresentadorField);
+                if (!grid.getChildren().contains(artistaChoiceBox))
+                    grid.add(artistaChoiceBox, 1, 1);
+                atualizarComboAlbuns();
+            }
+        });
+
+        artistaChoiceBox.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            atualizarComboAlbuns();
+        });
+
+        grid.getChildren().remove(apresentadorField);
+
+        panel.getChildren().add(grid);
         return panel;
     }
 
@@ -128,12 +229,29 @@ public class FaixasController {
         int segundos = segundosSpinner.getValue();
         Duration duracao = Duration.ofMinutes(minutos).plusSeconds(segundos);
 
+        Artista artista = null;
+        if (!"Podcast".equals(tipoChoiceBox.getValue())) {
+            artista = artistaChoiceBox.getValue();
+            if (artista == null) {
+                mostrarAlerta("Artista obrigatório", "Selecione um artista para a música.");
+                return;
+            }
+        }
+
         Faixa novaFaixa;
         if ("Podcast".equals(tipoChoiceBox.getValue())) {
             String apresentador = apresentadorField.getText().trim();
-            novaFaixa = faixaRepository.adicionarPodcast(nome, duracao, apresentador.isEmpty() ? null : apresentador);
+            novaFaixa = faixaRepository.adicionarPodcast(nome, duracao, null,
+                    apresentador.isEmpty() ? null : apresentador);
         } else {
-            novaFaixa = faixaRepository.adicionarMusica(nome, duracao);
+            Album album = albumChoiceBox.getValue();
+            novaFaixa = faixaRepository.adicionarMusica(nome, duracao, artista, album);
+        }
+
+        // Adicionar ao álbum se selecionado
+        Album album = albumChoiceBox.getValue();
+        if (album != null) {
+            albumRepository.adicionarFaixaNoAlbum(album.getId(), novaFaixa);
         }
 
         nomeField.clear();
@@ -141,9 +259,14 @@ public class FaixasController {
         segundosSpinner.getValueFactory().setValue(45);
         tipoChoiceBox.setValue("Música");
         apresentadorField.clear();
-        apresentadorField.setVisible(false);
+        // Resetar combos
+        if (!artistaChoiceBox.getItems().isEmpty())
+            artistaChoiceBox.getSelectionModel().selectFirst();
+        if (!albumChoiceBox.getItems().isEmpty())
+            albumChoiceBox.setValue(null);
+
         atualizarLista();
-        mostrarSucesso("Faixa adicionada!");
+        mostrarSucesso("Faixa adicionada" + (album != null ? " e vinculada ao álbum!" : "!"));
     }
 
     private void editarFaixa() {
@@ -194,12 +317,20 @@ public class FaixasController {
         StringBuilder detalhes = new StringBuilder();
         detalhes.append("ID: ").append(selecionada.getId()).append("\n");
         detalhes.append("Nome: ").append(selecionada.getNome()).append("\n");
-        detalhes.append("Duração: ").append(formatarDuracao(selecionada.getDuracao())).append("\n");
-        detalhes.append("Tipo: ").append(selecionada instanceof Podcast ? "🎙 Podcast" : "♪ Música");
         if (selecionada instanceof Podcast) {
             Podcast p = (Podcast) selecionada;
-            detalhes.append("\nApresentador: ").append(p.getApresentador() == null ? "(não informado)" : p.getApresentador());
+            detalhes.append("Apresentador: ")
+                    .append(p.getApresentador() == null ? "(não informado)" : p.getApresentador()).append("\n");
+        } else {
+            detalhes.append("Artista: ")
+                    .append(selecionada.getArtista() != null ? selecionada.getArtista().getNome() : "Desconhecido")
+                    .append("\n");
+            detalhes.append("Álbum: ")
+                    .append(selecionada.getAlbum() != null ? selecionada.getAlbum().getNome() : "Nenhum")
+                    .append("\n");
         }
+        detalhes.append("Duração: ").append(formatarDuracao(selecionada.getDuracao())).append("\n");
+        detalhes.append("Tipo: ").append(selecionada instanceof Podcast ? "🎙 Podcast" : "♪ Música");
 
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Detalhes da Faixa");
@@ -211,6 +342,52 @@ public class FaixasController {
     public void atualizarLista() {
         ObservableList<Faixa> items = FXCollections.observableArrayList(faixaRepository.listarTodas());
         listView.setItems(items);
+        atualizarComboArtistas();
+        atualizarComboAlbuns();
+    }
+
+    public void atualizarComboAlbuns() {
+        if (albumRepository != null && albumChoiceBox != null) {
+            Artista artistaSelecionado = artistaChoiceBox.getValue();
+            List<Album> albuns;
+
+            if (artistaSelecionado != null && !"Podcast".equals(tipoChoiceBox.getValue())) {
+                albuns = artistaSelecionado.getListaAlbuns();
+            } else {
+                // Se for podcast ou nenhum artista selecionado, mostra todos (ou vazio?)
+                // Para podcast, mostra todos. Para música sem artista (não deve acontecer),
+                // vazio.
+                if ("Podcast".equals(tipoChoiceBox.getValue())) {
+                    albuns = albumRepository.listarTodos();
+                } else {
+                    albuns = FXCollections.emptyObservableList();
+                }
+            }
+
+            if (albuns == null)
+                albuns = FXCollections.emptyObservableList();
+
+            Album selecionado = albumChoiceBox.getValue();
+            albumChoiceBox.setItems(FXCollections.observableArrayList(albuns));
+
+            if (selecionado != null && albumChoiceBox.getItems().contains(selecionado)) {
+                albumChoiceBox.setValue(selecionado);
+            } else {
+                albumChoiceBox.setValue(null);
+            }
+        }
+    }
+
+    public void atualizarComboArtistas() {
+        if (artistaRepository != null && artistaChoiceBox != null) {
+            Artista selecionado = artistaChoiceBox.getValue();
+            artistaChoiceBox.setItems(FXCollections.observableArrayList(artistaRepository.listarTodos()));
+            if (selecionado != null && artistaChoiceBox.getItems().contains(selecionado)) {
+                artistaChoiceBox.setValue(selecionado);
+            } else if (!artistaChoiceBox.getItems().isEmpty()) {
+                artistaChoiceBox.getSelectionModel().selectFirst();
+            }
+        }
     }
 
     private String formatarDuracao(Duration duracao) {
@@ -251,22 +428,26 @@ public class FaixasController {
                 cellBox.setStyle("-fx-border-color: #eee; -fx-border-width: 0 0 1 0;");
 
                 String icone = item instanceof Podcast ? "🎙" : "♪";
-                Label nomeLabel = new Label(icone + " " + item.getNome());
+                String textoPrincipal;
+
+                if (item instanceof Podcast) {
+                    Podcast p = (Podcast) item;
+                    String apresentador = p.getApresentador() != null ? p.getApresentador() : "Desconhecido";
+                    textoPrincipal = icone + " " + item.getNome() + " - " + apresentador;
+                } else {
+                    String nomeArtista = item.getArtista() != null ? item.getArtista().getNome() : "Desconhecido";
+                    String nomeAlbum = item.getAlbum() != null ? " • 💿 " + item.getAlbum().getNome() : "";
+                    textoPrincipal = icone + " " + item.getNome() + " - " + nomeArtista + nomeAlbum;
+                }
+
+                Label nomeLabel = new Label(textoPrincipal);
                 nomeLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
 
                 Label duracaoLabel = new Label(formatarDuracao(item.getDuracao()));
                 duracaoLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #999;");
 
-                String apresentador = item instanceof Podcast ? ((Podcast) item).getApresentador() : null;
-                if (apresentador != null && !apresentador.isBlank()) {
-                    Label apresentadorLabel = new Label("👤 " + apresentador);
-                    apresentadorLabel.setStyle("-fx-font-size: 10px; -fx-text-fill: #555;");
-                    VBox textBox = new VBox(nomeLabel, duracaoLabel, apresentadorLabel);
-                    cellBox.getChildren().add(textBox);
-                } else {
-                    VBox textBox = new VBox(nomeLabel, duracaoLabel);
-                    cellBox.getChildren().add(textBox);
-                }
+                VBox textBox = new VBox(nomeLabel, duracaoLabel);
+                cellBox.getChildren().add(textBox);
                 setGraphic(cellBox);
             }
         }

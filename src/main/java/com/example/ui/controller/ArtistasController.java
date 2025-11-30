@@ -143,6 +143,7 @@ public class ArtistasController {
                 atualizarLista();
                 mainController.atualizarComboArtistas();
                 mainController.atualizarListaDeAlbuns();
+                mainController.atualizarListaDeFaixas();
                 mostrarSucesso("Artista excluído!");
             }
         });

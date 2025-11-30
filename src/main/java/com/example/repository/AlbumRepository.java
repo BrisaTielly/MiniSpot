@@ -11,9 +11,12 @@ public class AlbumRepository {
     private List<Album> albuns;
     private long proximoId;
 
-    public AlbumRepository() {
+    private FaixaRepository faixaRepository;
+
+    public AlbumRepository(FaixaRepository faixaRepository) {
         this.albuns = new ArrayList<>();
         this.proximoId = 1;
+        this.faixaRepository = faixaRepository;
     }
 
     public List<Album> listarTodos() {
@@ -55,6 +58,9 @@ public class AlbumRepository {
     public void excluir(long id) {
         Album album = buscarPorId(id);
         if (album != null) {
+            // Excluir faixas do álbum
+            faixaRepository.excluirPorAlbum(album);
+
             if (album.getArtista() != null) {
                 album.getArtista().getListaAlbuns().remove(album);
             }
@@ -63,7 +69,17 @@ public class AlbumRepository {
     }
 
     public void excluirAlbunsPorArtista(long artistaId) {
-        albuns.removeIf(album -> album.getArtista() != null && album.getArtista().getId() == artistaId);
+        List<Album> albunsParaExcluir = new ArrayList<>();
+        for (Album album : albuns) {
+            if (album.getArtista() != null && album.getArtista().getId() == artistaId) {
+                albunsParaExcluir.add(album);
+            }
+        }
+
+        for (Album album : albunsParaExcluir) {
+            faixaRepository.excluirPorAlbum(album);
+            albuns.remove(album);
+        }
     }
 
     public void excluirPorArtista(Artista artista) {

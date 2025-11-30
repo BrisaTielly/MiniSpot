@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.Scanner;
 
 public class Main {
-    private static AlbumRepository albumRepository = new AlbumRepository();
-    private static ArtistaRepository artistaRepository = new ArtistaRepository(albumRepository);
     private static FaixaRepository faixaRepository = new FaixaRepository();
+    private static AlbumRepository albumRepository = new AlbumRepository(faixaRepository);
+    private static ArtistaRepository artistaRepository = new ArtistaRepository(albumRepository, faixaRepository);
     private static PlaylistRepository playlistRepository = new PlaylistRepository();
     private static Scanner scanner = new Scanner(System.in);
 
@@ -36,20 +36,23 @@ public class Main {
         Artista artista2 = artistaRepository.adicionar("João Silva");
         Artista artista3 = artistaRepository.adicionar("Maria Santos");
 
-        // Criar faixas (Música e Podcast)
-        Faixa faixa1 = faixaRepository.adicionarMusica("Canção da Manhã", Duration.ofMinutes(3).plusSeconds(45));
-        Faixa faixa2 = faixaRepository.adicionarPodcast("Noite Estrelada", Duration.ofMinutes(4).plusSeconds(20));
-        Faixa faixa3 = faixaRepository.adicionarMusica("Vento do Sul", Duration.ofMinutes(3).plusSeconds(15));
-        Faixa faixa4 = faixaRepository.adicionarPodcast("Melodia do Coração", Duration.ofMinutes(5).plusSeconds(10));
-
         // Criar álbuns
         Album album1 = albumRepository.adicionar("Amanhecer", artista1, Year.of(2023));
-        albumRepository.adicionarFaixaNoAlbum(album1.getId(), faixa1);
-        albumRepository.adicionarFaixaNoAlbum(album1.getId(), faixa2);
-
         Album album2 = albumRepository.adicionar("Horizontes", artista2, Year.of(2024));
+
+        // Criar faixas (Música e Podcast)
+        Faixa faixa1 = faixaRepository.adicionarMusica("Canção da Manhã", Duration.ofMinutes(3).plusSeconds(45),
+                artista1, album1);
+        Faixa faixa2 = faixaRepository.adicionarPodcast("Noite Estrelada", Duration.ofMinutes(4).plusSeconds(20), null,
+                "Pedro Bial");
+        Faixa faixa3 = faixaRepository.adicionarMusica("Vento do Sul", Duration.ofMinutes(3).plusSeconds(15), artista2,
+                album2);
+        Faixa faixa4 = faixaRepository.adicionarPodcast("Melodia do Coração", Duration.ofMinutes(5).plusSeconds(10),
+                null, "Fátima Bernardes");
+
+        // Associar faixas aos álbuns (garantir consistência)
+        albumRepository.adicionarFaixaNoAlbum(album1.getId(), faixa1);
         albumRepository.adicionarFaixaNoAlbum(album2.getId(), faixa3);
-        albumRepository.adicionarFaixaNoAlbum(album2.getId(), faixa4);
 
         // Criar playlist
         Playlist playlist1 = playlistRepository.adicionar("Minhas Favoritas", true);
@@ -439,13 +442,23 @@ public class Main {
         System.out.print("Escolha: ");
         int tipo = lerInteiro();
 
+        listarArtistas();
+        System.out.print("Digite o ID do artista: ");
+        long idArtista = lerLong();
+        Artista artista = artistaRepository.buscarPorId(idArtista);
+        if (artista == null) {
+            System.out.println("❌ Artista não encontrado!");
+            return;
+        }
+
         Duration duracao = Duration.ofMinutes(minutos).plusSeconds(segundos);
         Faixa novaFaixa;
         
         if (tipo == 2) {
-            novaFaixa = faixaRepository.adicionarPodcast(nome, duracao);
+            novaFaixa = faixaRepository.adicionarPodcast(nome, duracao, artista);
         } else {
-            novaFaixa = faixaRepository.adicionarMusica(nome, duracao);
+            // Na CLI simplificada, não estamos pedindo álbum por enquanto, passamos null
+            novaFaixa = faixaRepository.adicionarMusica(nome, duracao, artista, null);
         }
         
         System.out.println("✅ Faixa '" + nome + "' adicionada com sucesso! (ID: " + novaFaixa.getId() + ")");
